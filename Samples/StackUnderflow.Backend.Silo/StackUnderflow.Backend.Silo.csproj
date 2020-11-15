@@ -18,6 +18,5 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Primitives\Access.Primitives.IO.Extensions\Access.Primitives.IO.Extensions.csproj" />
     <ProjectReference Include="..\StackUnderflow.Backoffice.Adapters\StackUnderflow.Adapters.csproj" />
-    <ProjectReference Include="..\StackUnderflow.Grains\StackUnderflow.Backend.Grains.csproj" />
   </ItemGroup>
 </Project>

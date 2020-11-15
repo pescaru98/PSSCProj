@@ -17,17 +17,13 @@ namespace StackUnderflow.Domain.Core
 {
     public static class BackofficeDomain
     {
-        public static Port<ICreateTenantResult> CreateTenant(Guid organisationId, string tenantName, string description, string adminEmail, string adminName, Guid userId) =>
-            NewPort<CreateTenantCmd, ICreateTenantResult>(new CreateTenantCmd(organisationId, tenantName, description, adminEmail, adminName, userId));
+        public static Port<ICreateTenantResult> CreateTenant(CreateTenantCmd command) => NewPort<CreateTenantCmd, ICreateTenantResult>(command);
 
-        public static Port<IInviteTenantAdminResult> InviteTenantAdmin(Option<User> adminUser) =>
-            NewPort<InviteTenantAdminCmd, IInviteTenantAdminResult>(new InviteTenantAdminCmd(adminUser));
+        public static Port<IInviteTenantAdminResult> InviteTenantAdmin(InviteTenantAdminCmd command) => NewPort<InviteTenantAdminCmd, IInviteTenantAdminResult>(command);
 
-        public static Port<IInviteUserResult> InviteUser(Guid organisationId, Guid userId, string userName, string userEmail) =>
-            NewPort<InviteUserCmd, IInviteUserResult>(new InviteUserCmd(organisationId, userId, userName, userEmail));
+        public static Port<IInviteUserResult> InviteUser(InviteUserCmd command) => NewPort<InviteUserCmd, IInviteUserResult>(command);
 
-        public static Port<SetPermissionResult> SetPermissions(Option<Guid> userId, int level) =>
-            NewPort<SetPermissionCmd, SetPermissionResult>(new SetPermissionCmd(userId, level));
+        public static Port<SetPermissionResult> SetPermissions(SetPermissionCmd command) => NewPort<SetPermissionCmd, SetPermissionResult>(command);
     }
 }
 

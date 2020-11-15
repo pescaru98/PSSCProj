@@ -10,7 +10,6 @@ using Access.Primitives.IO.Attributes;
 using Access.Primitives.IO.Mocking;
 using StackUnderflow.Domain.Core.Contexts;
 using StackUnderflow.EF.Models;
-using Xunit;
 using static StackUnderflow.Domain.Schema.Backoffice.CreateTenantOp.CreateTenantResult;
 
 namespace StackUnderflow.Backoffice.Adapters.CreateTenant
@@ -24,10 +23,10 @@ namespace StackUnderflow.Backoffice.Adapters.CreateTenant
             _ex = ex;
         }
 
-        public override async Task<ICreateTenantResult> Work(CreateTenantCmd Op, BackofficeWriteContext state)
+        public override async Task<ICreateTenantResult> Work(CreateTenantCmd command, BackofficeWriteContext state)
         {
-            var workflow = from valid in Op.TryValidate()
-                           let t = AddTenantIfMissing(state, CreateTenantFromCommand(Op))
+            var workflow = from valid in command.TryValidate()
+                           let t = AddTenantIfMissing(state, CreateTenantFromCommand(command))
                            select t;
 
 
@@ -68,6 +67,11 @@ namespace StackUnderflow.Backoffice.Adapters.CreateTenant
                 }
             });
             return tenant;
+        }
+
+        public override Task PostConditions(CreateTenantCmd cmd, ICreateTenantResult result, BackofficeWriteContext state)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

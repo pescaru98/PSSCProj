@@ -26,8 +26,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Primitives\Access.Primitives.IO\Access.Primitives.IO.csproj" />
-    <ProjectReference Include="..\StackUnderflow.API.GraphQL\StackUnderflow.API.GraphQL.csproj" />
-    <ProjectReference Include="..\StackUnderflow.Grains\StackUnderflow.Backend.Grains.csproj" />
     <ProjectReference Include="..\StackUnderflow.Schema\StackUnderflow.Domain.Schema.csproj" />
   </ItemGroup>
 </Project>

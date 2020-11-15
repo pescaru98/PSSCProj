@@ -17,12 +17,12 @@ namespace StackUnderflow.Domain.Schema.Backoffice.CreateTenantOp
         public class TenantCreated : ICreateTenantResult
         {
             public Tenant Tenant { get; }
-            public User User { get; }
+            public User AdminUser { get; }
 
-            public TenantCreated(Tenant tenant, User user)
+            public TenantCreated(Tenant tenant, User adminUser)
             {
                 Tenant = tenant;
-                User = user;
+                AdminUser = adminUser;
             }
 
             public object Clone() => this.ShallowClone();
