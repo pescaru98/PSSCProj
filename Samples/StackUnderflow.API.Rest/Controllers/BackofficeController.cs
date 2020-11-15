@@ -11,6 +11,8 @@ using StackUnderflow.Domain.Schema.Backoffice.CreateTenantOp;
 using StackUnderflow.EF.Models;
 using Access.Primitives.EFCore;
 using StackUnderflow.Domain.Schema.Backoffice.InviteTenantAdminOp;
+using StackUnderflow.Domain.Schema.Backoffice;
+using LanguageExt;
 
 namespace StackUnderflow.API.Rest.Controllers
 {
@@ -27,10 +29,13 @@ namespace StackUnderflow.API.Rest.Controllers
             _dbContext = dbContext;
         }
 
-        [HttpPost("createTenant")]
+        [HttpPost("tenant")]
         public async Task<IActionResult> CreateTenantAsyncAndInviteAdmin([FromBody] CreateTenantCmd createTenantCmd)
         {
-            BackofficeWriteContext ctx = await LoadDbContext(createTenantCmd);
+            BackofficeWriteContext ctx = new BackofficeWriteContext(new List<Tenant>(), new List<TenantUser>(), new List<User>());
+            var dependencies = new BackofficeDependencies();
+            dependencies.GenerateInvitationToken = () => Guid.NewGuid().ToString();
+            dependencies.SendInvitationEmail = (InvitationLetter letter) => async ()=>new InvitationAcknowledgement(Guid.NewGuid().ToString());
 
             var expr = from createTenantResult in BackofficeDomain.CreateTenant(createTenantCmd)
                        let adminUser = createTenantResult.SafeCast<CreateTenantResult.TenantCreated>().Select(p => p.AdminUser)
@@ -38,35 +43,12 @@ namespace StackUnderflow.API.Rest.Controllers
                        from inviteAdminResult in BackofficeDomain.InviteTenantAdmin(inviteAdminCmd)
                        select new { createTenantResult, inviteAdminResult };
 
-            var r = await _interpreter.Interpret(expr, ctx);
-
-            await _dbContext.SaveChangesAsync();
+            var r = await _interpreter.Interpret(expr, ctx, dependencies);
 
             return r.createTenantResult.Match(
                 created => (IActionResult)Ok(created.Tenant.TenantId),
                 notCreated => BadRequest("Tenant could not be created."),
                 invalidRequest => BadRequest("Invalid request."));
-        }
-
-        async Task<BackofficeWriteContext> LoadDbContext(CreateTenantCmd createTenantCmd)
-        {
-            return await _dbContext.LoadAsync("dbo.BackofficeHttpController", new
-            {
-                OrganisationId = createTenantCmd.OrganisationId
-            }, async reader =>
-            {
-                var tenants = await reader.ReadAsync<Tenant>();
-                var tenantUsers = await reader.ReadAsync<TenantUser>();
-                var users = await reader.ReadAsync<User>();
-
-                _dbContext.AttachRange(tenants);
-                _dbContext.AttachRange(tenantUsers);
-                _dbContext.AttachRange(users);
-                return new BackofficeWriteContext(
-                    new EFList<Tenant>(_dbContext.Tenant),
-                    new EFList<TenantUser>(_dbContext.TenantUser),
-                    new EFList<User>(_dbContext.User));
-            });
         }
     }
 }

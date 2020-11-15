@@ -14,10 +14,13 @@ namespace StackUnderflow.Domain.Schema.Backoffice.InviteTenantAdminOp
             public User AdminUser { get; }
             public string ActivationCode { get; }
 
-            public TenantAdminInvited(User adminUser, string activationCode)
+            public string InvitationAcknowlwedgement { get; set; }
+
+            public TenantAdminInvited(User adminUser, string activationCode, string invitationAcknowledgement)
             {
                 AdminUser = adminUser;
                 ActivationCode = activationCode;
+                InvitationAcknowlwedgement = invitationAcknowledgement;
             }
             ///TODO
         }

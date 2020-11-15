@@ -11,10 +11,11 @@ using Access.Primitives.IO.Mocking;
 using StackUnderflow.Domain.Core.Contexts;
 using StackUnderflow.EF.Models;
 using static StackUnderflow.Domain.Schema.Backoffice.CreateTenantOp.CreateTenantResult;
+using StackUnderflow.Domain.Schema.Backoffice;
 
 namespace StackUnderflow.Backoffice.Adapters.CreateTenant
 {
-    public partial class CreateTenantAdapter : Adapter<CreateTenantCmd, ICreateTenantResult, BackofficeWriteContext>
+    public partial class CreateTenantAdapter : Adapter<CreateTenantCmd, ICreateTenantResult, BackofficeWriteContext, BackofficeDependencies>
     {
         private readonly IExecutionContext _ex;
 
@@ -23,7 +24,7 @@ namespace StackUnderflow.Backoffice.Adapters.CreateTenant
             _ex = ex;
         }
 
-        public override async Task<ICreateTenantResult> Work(CreateTenantCmd command, BackofficeWriteContext state)
+        public override async Task<ICreateTenantResult> Work(CreateTenantCmd command, BackofficeWriteContext state, BackofficeDependencies dependencies)
         {
             var workflow = from valid in command.TryValidate()
                            let t = AddTenantIfMissing(state, CreateTenantFromCommand(command))
@@ -69,9 +70,9 @@ namespace StackUnderflow.Backoffice.Adapters.CreateTenant
             return tenant;
         }
 
-        public override Task PostConditions(CreateTenantCmd cmd, ICreateTenantResult result, BackofficeWriteContext state)
+        public override Task PostConditions(CreateTenantCmd op, CreateTenantResult.ICreateTenantResult result, BackofficeWriteContext state)
         {
-            throw new System.NotImplementedException();
+            return Task.CompletedTask;
         }
     }
 }
