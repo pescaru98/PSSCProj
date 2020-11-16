@@ -31,6 +31,8 @@ namespace StackUnderflow.Domain.Schema.Backoffice.CreateTenantOp
 
         public class TenantNotCreated : ICreateTenantResult
         {
+            public string Reason { get; private set; }
+
             ///TODO
             public object Clone() => this.ShallowClone();
         }
