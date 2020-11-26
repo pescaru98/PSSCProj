@@ -13,6 +13,7 @@ using Access.Primitives.EFCore;
 using StackUnderflow.Domain.Schema.Backoffice.InviteTenantAdminOp;
 using StackUnderflow.Domain.Schema.Backoffice;
 using LanguageExt;
+using Microsoft.AspNetCore.Http;
 
 namespace StackUnderflow.API.Rest.Controllers
 {
@@ -32,7 +33,11 @@ namespace StackUnderflow.API.Rest.Controllers
         [HttpPost("tenant")]
         public async Task<IActionResult> CreateTenantAsyncAndInviteAdmin([FromBody] CreateTenantCmd createTenantCmd)
         {
-            BackofficeWriteContext ctx = new BackofficeWriteContext(new List<Tenant>(), new List<TenantUser>(), new List<User>());
+            BackofficeWriteContext ctx = new BackofficeWriteContext(
+                new EFList<Tenant>(_dbContext.Tenant),
+                new EFList<TenantUser>(_dbContext.TenantUser),
+                new EFList<User>(_dbContext.User));
+
             var dependencies = new BackofficeDependencies();
             dependencies.GenerateInvitationToken = () => Guid.NewGuid().ToString();
             dependencies.SendInvitationEmail = (InvitationLetter letter) => async ()=>new InvitationAcknowledgement(Guid.NewGuid().ToString());
@@ -44,11 +49,11 @@ namespace StackUnderflow.API.Rest.Controllers
                        select new { createTenantResult, inviteAdminResult };
 
             var r = await _interpreter.Interpret(expr, ctx, dependencies);
-
+            _dbContext.SaveChanges();
             return r.createTenantResult.Match(
                 created => (IActionResult)Ok(created.Tenant.TenantId),
-                notCreated => BadRequest("Tenant could not be created."),
-                invalidRequest => BadRequest("Invalid request."));
+                notCreated => StatusCode(StatusCodes.Status500InternalServerError, "Tenant could not be created."),//todo return 500 (),
+            invalidRequest => BadRequest("Invalid request."));
         }
     }
 }

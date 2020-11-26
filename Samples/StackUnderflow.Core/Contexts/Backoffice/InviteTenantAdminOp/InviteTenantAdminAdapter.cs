@@ -14,11 +14,9 @@ namespace StackUnderflow.Adapters.InviteAdmin
 {
     public partial class InviteTenantAdminAdapter : Adapter<InviteTenantAdminCmd, IInviteTenantAdminResult, BackofficeWriteContext, BackofficeDependencies>
     {
-        private readonly IExecutionContext _ex;
 
-        public InviteTenantAdminAdapter(IExecutionContext ex)
+        public InviteTenantAdminAdapter()
         {
-            _ex = ex;
         }
 
         public override async Task<IInviteTenantAdminResult> Work(InviteTenantAdminCmd command, BackofficeWriteContext state, BackofficeDependencies dependencies)

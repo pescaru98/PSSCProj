@@ -13,7 +13,10 @@ namespace StackUnderflow.Domain.Core
 {
     public static class BackofficeDomain
     {
-        public static Port<ICreateTenantResult> CreateTenant(CreateTenantCmd command) => NewPort<CreateTenantCmd, ICreateTenantResult>(command);
+        public static Port<ICreateTenantResult> CreateTenant(CreateTenantCmd command)
+        {
+            return NewPort<CreateTenantCmd, ICreateTenantResult>(command);
+        }
 
         public static Port<IInviteTenantAdminResult> InviteTenantAdmin(InviteTenantAdminCmd command) => NewPort<InviteTenantAdminCmd, IInviteTenantAdminResult>(command);
     }
