@@ -33,13 +33,15 @@ namespace StackUnderflow.EF.Models
         public virtual DbSet<UserBadge> UserBadge { get; set; }
         public virtual DbSet<Vote> Vote { get; set; }
         public virtual DbSet<VoteType> VoteType { get; set; }
+/*        public virtual DbSet<QuestionHomework> QuestionHomework { get; set; }
+        public virtual DbSet<UserHomework> UserHomework { get; set; }*/
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=ACCESS-1303SF2\\SQL2017;Database=StackUnderflow;Integrated Security=true;");
+                optionsBuilder.UseSqlServer("Server=DESKTOP-MRRJCNB;Database=stackunderflow;Trusted_Connection=true;");
             }
         }
 
@@ -364,6 +366,19 @@ namespace StackUnderflow.EF.Models
                     .HasMaxLength(100);
             });
 
+/*            modelBuilder.Entity<QuestionHomework>(entity =>
+            {
+                entity.HasKey(e => e.QuestionId);
+
+                entity.Property(e => e.Title)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.Body)
+                    .IsRequired()
+                    .HasMaxLength(3000);
+
+            });*/
             OnModelCreatingPartial(modelBuilder);
         }
 

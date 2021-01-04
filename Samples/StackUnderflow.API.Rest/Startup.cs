@@ -20,6 +20,7 @@ using Microsoft.Extensions.Logging;
 using OpenTracing;
 using OpenTracing.Util;
 using StackUnderflow.Backoffice.Adapters.CreateTenant;
+using StackUnderflow.Domain.Core.Contexts.Question.ValidateQuestionOp;
 using StackUnderflow.EF.Models;
 
 namespace FakeSO.API.Rest
@@ -37,6 +38,7 @@ namespace FakeSO.API.Rest
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddOperations(typeof(CreateTenantAdapter).Assembly);
+            services.AddOperations(typeof(ValidateQuestionAdapter).Assembly);
             services.AddSingleton<IExecutionContext, LiveExecutionContext>();
             services.AddTransient<IInterpreterAsync>(sp => new LiveInterpreterAsync(sp));
 
