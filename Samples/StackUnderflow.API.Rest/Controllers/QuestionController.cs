@@ -45,13 +45,16 @@ namespace StackUnderflow.API.Rest.Controllers
         [HttpPost("question")]
         public async Task<IActionResult> CreateQuestionAndSendEmail([FromBody] ValidateQuestionCmd validateQuestionCmd)
         {
+
+            var dbPosts =  _dbContext.Post.ToList();
+            _dbContext.Post.AttachRange(dbPosts);
+
             QuestionWriteContext ctx = new QuestionWriteContext(new EFList<Post>(_dbContext.Post));
 
             var dependencies = new QuestionDependencies();
 
             var expr = from validateQuestionResult in QuestionDomain.ValidateQuestion(validateQuestionCmd)
-                       let post = validateQuestionResult.SafeCast<QuestionValidated>().Select(p => p.Post)
-                       let postResult = validateQuestionResult.SafeCast<QuestionValidated>().ToList().Single()
+                       let postResult = validateQuestionResult.SafeCast<QuestionValidated>().FirstOrDefault()
                        let languageCmd = new LanguageCheckCmd(postResult.Post.Title, postResult.Post.PostText)
                        from languageCheck in QuestionDomain.LanguageCheck(languageCmd)
                        select new { validateQuestionResult, languageCheck };
@@ -62,7 +65,7 @@ namespace StackUnderflow.API.Rest.Controllers
             if (r.languageCheck.SafeCast<LanguageOK>().IsNone)
                 return BadRequest("Bad Language");
 
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
             return r.validateQuestionResult.Match(
                 created => (IActionResult)Ok(created.Post.PostId),
                 notCreated => StatusCode(StatusCodes.Status500InternalServerError, "Question could not be created."),

@@ -42,6 +42,15 @@ namespace StackUnderflow.API.Rest.Controllers
         [HttpPost("tenant")]
         public async Task<IActionResult> CreateTenantAsyncAndInviteAdmin([FromBody] CreateTenantCmd createTenantCmd)
         {
+
+            var dbTenants = _dbContext.Tenant.ToList();
+            var dbTenantUsers = _dbContext.TenantUser.ToList();
+            var dbUsers = _dbContext.User.ToList();
+
+            _dbContext.Tenant.AttachRange(dbTenants);
+            _dbContext.TenantUser.AttachRange(dbTenantUsers);
+            _dbContext.User.AttachRange(dbUsers);
+
             BackofficeWriteContext ctx = new BackofficeWriteContext(
                 new EFList<Tenant>(_dbContext.Tenant),
                 new EFList<TenantUser>(_dbContext.TenantUser),

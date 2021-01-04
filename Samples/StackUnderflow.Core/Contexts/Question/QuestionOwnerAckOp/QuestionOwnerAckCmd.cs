@@ -9,13 +9,13 @@ namespace StackUnderflow.Domain.Core.Contexts.Question.QuestionOwnerAckOp
 {
     public struct QuestionOwnerAckCmd
     {
-        public QuestionOwnerAckCmd(User user)
+        public QuestionOwnerAckCmd(Guid userId)
         {
-            User = user;
+            UserId = userId;
         }
 
         [Required]
-        public User User { get; set; }
+        public Guid UserId { get; set; }
 
     }
 }
