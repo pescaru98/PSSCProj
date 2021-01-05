@@ -8,6 +8,6 @@ namespace GrainInterfaces
 {
     public interface IEmailSender : IGrainWithIntegerKey
     {
-        Task<string> SendEmailAsync(string message);
+        Task<string> SendEmailAsync(string emailMessage, string emailTitle = "Default Title", string to = "", string toName = "");
     }
 }

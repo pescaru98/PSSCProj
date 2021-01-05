@@ -30,7 +30,7 @@ namespace StackUnderflow.Domain.Core.Contexts.Question.ValidateQuestionOp
         public override async Task<IValidateQuestionResult> Work(ValidateQuestionCmd cmd, QuestionWriteContext state, QuestionDependencies dependencies)
         {
             var workflow = from valid in cmd.TryValidate()
-                           let p = addQuestionIfMissing(state, CreatePostFromCommand(cmd))
+                           let p = addQuestionIfMissing(state, CreatePostFromCommand(cmd), GetUserFromCmd(state,cmd))
                            select p;
 
             var result = await workflow.Match(
@@ -40,13 +40,14 @@ namespace StackUnderflow.Domain.Core.Contexts.Question.ValidateQuestionOp
             return result;
         }
 
-        public IValidateQuestionResult addQuestionIfMissing(QuestionWriteContext state, Post post)
+        public IValidateQuestionResult addQuestionIfMissing(QuestionWriteContext state, Post post, User user)
         {
             if (state.Posts.Any(p => String.Compare(p.Title,post.Title) == 0) == true)
                 return new QuestionInvalidated("Duplicate Title");
             if (state.Posts.All(p => p.PostId != post.PostId))
                 state.Posts.Add(post);
-            return new QuestionValidated(post);
+
+            return new QuestionValidated(post, user);
         }
 
         private Post CreatePostFromCommand(ValidateQuestionCmd cmd)
@@ -61,6 +62,15 @@ namespace StackUnderflow.Domain.Core.Contexts.Question.ValidateQuestionOp
             };
 
             return post;
+        }
+
+        private User GetUserFromCmd(QuestionWriteContext state, ValidateQuestionCmd cmd)
+        {
+            IEnumerable<User> ReturnedUser = from user in state.Users
+                                             where user.UserId == cmd.UserId
+                                             select user;
+
+            return ReturnedUser.First();
         }
     }
 }

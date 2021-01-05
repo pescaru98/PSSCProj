@@ -24,6 +24,7 @@ using System.Threading.Tasks;
 using LanguageExt;
 using StackUnderflow.Domain.Core.Contexts.Question.LanguageCheckOp;
 using static StackUnderflow.Domain.Core.Contexts.Question.LanguageCheckOp.LanguageCheckResult;
+using StackUnderflow.Domain.Core.Contexts.Question.QuestionOwnerAckOp;
 
 namespace StackUnderflow.API.Rest.Controllers
 {
@@ -47,9 +48,12 @@ namespace StackUnderflow.API.Rest.Controllers
         {
 
             var dbPosts =  _dbContext.Post.ToList();
-            _dbContext.Post.AttachRange(dbPosts);
+            var dbUsers = _dbContext.User.ToList();
 
-            QuestionWriteContext ctx = new QuestionWriteContext(new EFList<Post>(_dbContext.Post));
+            _dbContext.Post.AttachRange(dbPosts);
+            _dbContext.User.AttachRange(dbUsers);
+
+            QuestionWriteContext ctx = new QuestionWriteContext(new EFList<Post>(_dbContext.Post), new EFList<User>(_dbContext.User));
 
             var dependencies = new QuestionDependencies();
 
@@ -57,6 +61,8 @@ namespace StackUnderflow.API.Rest.Controllers
                        let postResult = validateQuestionResult.SafeCast<QuestionValidated>().FirstOrDefault()
                        let languageCmd = new LanguageCheckCmd(postResult.Post.Title, postResult.Post.PostText)
                        from languageCheck in QuestionDomain.LanguageCheck(languageCmd)
+                       let questionOwnerAckCmd = new QuestionOwnerAckCmd(postResult.User, "You have posted a new question")
+                       from questionOwnerAck in QuestionDomain.QuestionOwnerAck(questionOwnerAckCmd)
                        select new { validateQuestionResult, languageCheck };
             
             var r = await _interpreter.Interpret(expr, ctx, dependencies);

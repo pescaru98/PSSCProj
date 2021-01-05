@@ -17,12 +17,12 @@ namespace StackUnderflow.Domain.Core.Contexts.Question.ValidateQuestionOp
         public class QuestionValidated : IValidateQuestionResult
         {
             public Post Post { get; }
-            //public User User { get; }
+            public User User { get; }
 
-            public QuestionValidated(Post post)
+            public QuestionValidated(Post post, User user)
             {
                 Post = post;
-                //User = user;
+                User = user;
             }
 
             public object Clone() => this.ShallowClone(); //what's this?

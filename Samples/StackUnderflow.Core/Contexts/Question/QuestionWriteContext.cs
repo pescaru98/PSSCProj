@@ -12,10 +12,11 @@ namespace StackUnderflow.Domain.Core.Contexts.Question
     public class QuestionWriteContext
     {
         public ICollection<Post> Posts { get; }
-
-        public QuestionWriteContext(ICollection<Post> posts)
+        public ICollection<User> Users { get; }
+        public QuestionWriteContext(ICollection<Post> posts, ICollection<User> users)
         {
             Posts = posts ?? new List<Post>(0);
+            Users = users ?? new List<User>(0);
         }
     }
 }
